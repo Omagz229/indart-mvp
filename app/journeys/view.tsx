@@ -180,11 +180,6 @@ function JourneyCard({ journey, index }: { journey: JourneyItem; index: number }
         </div>
         <h3 style={{ fontFamily: FONT_DISPLAY, fontWeight: FW.regular, fontSize: TS.dm, lineHeight: 1.2, color: CREAM, fontFeatureSettings: FEATURES_DISPLAY, margin: "0 0 8px", whiteSpace: "pre-line" }}>{journey.title}</h3>
         <p style={{ fontFamily: FONT_UI, fontSize: "12px", fontStyle: "italic", color: MUTED, margin: "0 0 16px" }}>{journey.tagline}</p>
-        {journey.themes.length > 0 && (
-          <div style={{ position: "relative", zIndex: 1, marginBottom: "12px" }}>
-            <ThemeTagList themes={journey.themes} size="sm" max={2} />
-          </div>
-        )}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <p style={{ fontFamily: FONT_UI, fontSize: "12px", color: CREAM_D, margin: 0 }}>{journey.thinkerName}</p>
@@ -194,6 +189,11 @@ function JourneyCard({ journey, index }: { journey: JourneyItem; index: number }
             <path d="M2 7H12M12 7L8 3M12 7L8 11" stroke={GOLD} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
+        {journey.themes.length > 0 && (
+          <div style={{ position: "relative", zIndex: 1, marginTop: "14px" }}>
+            <ThemeTagList themes={journey.themes} size="sm" max={2} />
+          </div>
+        )}
       </div>
     </motion.div>
   )
