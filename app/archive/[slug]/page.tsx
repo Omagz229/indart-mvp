@@ -50,7 +50,7 @@ export default async function ArchiveItemPage({ params }: { params: Promise<{ sl
     description: ptToStrings((raw.description ?? []) as Parameters<typeof ptToStrings>[0]).join(" "),
     annotation: ptToStrings((raw.annotation ?? []) as Parameters<typeof ptToStrings>[0]),
     imageUrl: raw.coverImage ? imageUrl.cover(raw.coverImage) : "",
-    themes: (raw.themes ?? []).map((t) => ({ name: t.name, slug: t.slug })),
+    themes: (raw.themes ?? []).map((t) => ({ name: t.name, slug: t.slug, color: t.color })),
     relatedThinkers: (raw.relatedThinkers ?? []).map((t) => ({
       slug: t.slug ?? "",
       name: t.name ?? "",
@@ -78,6 +78,6 @@ type SanityArchiveItem = {
   annotation?: unknown[]
   coverImage?: unknown
   access?: { tier: string | null }
-  themes?: { name: string; slug: string }[]
+  themes?: { name: string; slug: string; color?: string }[]
   relatedThinkers?: { slug?: string; name?: string; portrait?: unknown; thinkerTitle?: string }[]
 }

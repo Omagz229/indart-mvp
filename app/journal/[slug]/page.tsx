@@ -48,7 +48,7 @@ export default async function JournalEntryPage({ params }: { params: Promise<{ s
     publishedAt: raw.publishedAt ?? "",
     readingTime: raw.readingTime ?? "",
     disciplines: (raw.disciplines ?? []).map((d) => d.name),
-    themes: (raw.themes ?? []).map((t) => ({ name: t.name, slug: t.slug })),
+    themes: (raw.themes ?? []).map((t) => ({ name: t.name, slug: t.slug, color: t.color })),
     type: raw.type ?? "essay",
     coverImage: raw.coverImage ? imageUrl.cover(raw.coverImage) : "",
     body: ptToBodyBlocks((raw.content ?? []) as Parameters<typeof ptToBodyBlocks>[0]),
@@ -71,7 +71,7 @@ type SanityJournalEntry = {
   coverImage?: unknown
   access?: { tier: string | null }
   disciplines?: { name: string }[]
-  themes?: { name: string; slug: string }[]
+  themes?: { name: string; slug: string; color?: string }[]
   author?: { name?: string; slug?: string; thinkerTitle?: string }
   authorName?: string
 }

@@ -52,7 +52,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ s
     format: raw.format ?? "video",
     duration: raw.duration ?? "",
     disciplines: (raw.disciplines ?? []).map((d) => d.name),
-    themes: (raw.themes ?? []).map((t) => ({ name: t.name, slug: t.slug })),
+    themes: (raw.themes ?? []).map((t) => ({ name: t.name, slug: t.slug, color: t.color })),
     access: accessTier(raw.access),
     transcriptExcerpt: ptToStrings((raw.transcript ?? []) as Parameters<typeof ptToStrings>[0]),
   }
@@ -74,7 +74,7 @@ type SanityConversation = {
   publishedAt?: string
   access?: { tier: string | null }
   disciplines?: { name: string }[]
-  themes?: { name: string; slug: string }[]
+  themes?: { name: string; slug: string; color?: string }[]
   participants?: {
     role?: string
     thinker?: { name?: string; slug?: string; portrait?: unknown; thinkerTitle?: string }
