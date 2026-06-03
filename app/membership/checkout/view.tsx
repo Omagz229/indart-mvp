@@ -75,6 +75,7 @@ export default function CheckoutView({ tier: tierParam }: Props) {
   const [email, setEmail] = React.useState("")
   const [annual, setAnnual] = React.useState(false)
   const [error, setError] = React.useState("")
+  const [loading, setLoading] = React.useState(false)
 
   function handleConfirm() {
     setStep("details")
@@ -82,8 +83,26 @@ export default function CheckoutView({ tier: tierParam }: Props) {
 
   async function handleComplete(e: React.FormEvent) {
     e.preventDefault()
-    // Phase 6 wires this to real Stripe — see app/api/checkout/route.ts
-    alert("Stripe checkout not yet configured.")
+    const billing: "monthly" | "annual" | "lifetime" =
+      tierKey === "founding-patron" ? "lifetime" : annual ? "annual" : "monthly"
+    setLoading(true)
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier: tierKey, billing }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error ?? "Checkout failed. Please try again.")
+        return
+      }
+      window.location.href = data.checkoutUrl
+    } catch {
+      setError("Network error. Please try again.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -200,8 +219,8 @@ export default function CheckoutView({ tier: tierParam }: Props) {
 
           <div style={{ padding: "14px 20px", background: "rgba(181,131,44,0.04)", border: "1px solid rgba(181,131,44,0.09)" }}>
             <p style={{ fontFamily: FONT_UI, fontSize: "9px", color: MUTED, margin: 0, lineHeight: "1.7" }}>
-              <strong style={{ color: "rgba(181,131,44,0.6)", fontWeight: FW.medium }}>Demo mode.</strong>
-              {" "}No real payment is processed. In production, this step would connect to secure Stripe checkout.
+              <strong style={{ color: "rgba(181,131,44,0.6)", fontWeight: FW.medium }}>Secure checkout.</strong>
+              {" "}You will be redirected to Stripe to complete your payment safely.
             </p>
           </div>
         </motion.div>
@@ -418,28 +437,29 @@ export default function CheckoutView({ tier: tierParam }: Props) {
 
                     <button
                       type="submit"
+                      disabled={loading}
                       style={{
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         gap: "10px",
                         padding: "16px",
-                        background: GOLD,
+                        background: loading ? "rgba(181,131,44,0.5)" : GOLD,
                         border: "none",
-                        cursor: "pointer",
+                        cursor: loading ? "not-allowed" : "pointer",
                         marginTop: "8px",
                         transition: "background 0.3s ease",
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = GOLD_H)}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = GOLD)}
+                      onMouseEnter={(e) => { if (!loading) e.currentTarget.style.background = GOLD_H }}
+                      onMouseLeave={(e) => { if (!loading) e.currentTarget.style.background = GOLD }}
                     >
                       <span style={{ fontFamily: FONT_UI, fontSize: "10px", fontWeight: FW.medium, letterSpacing: LS.widened, color: BG_INK, textTransform: "uppercase" as const }}>
-                        Complete Membership
+                        {loading ? "Preparing checkout…" : "Continue to Payment"}
                       </span>
                     </button>
 
                     <p style={{ fontFamily: FONT_UI, fontWeight: FW.light, fontSize: "10px", color: "rgba(114,100,86,0.55)", lineHeight: "1.65", margin: 0, textAlign: "center" as const }}>
-                      Demo mode — no real payment required
+                      Secure payment via Stripe
                     </p>
                   </motion.form>
                 )}
