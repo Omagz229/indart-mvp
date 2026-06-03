@@ -116,7 +116,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
         break
 
       case "payment_intent.succeeded":
-        await handlePatronPayment(event, clerkUserId, clerk)
+        await handlePatronPayment(event, clerkUserId, clerk, publicMeta)
         break
     }
 
@@ -201,8 +201,11 @@ async function handleSubscriptionUpdated(
   const sub = event.data.object as Stripe.Subscription
 
   // User canceled but keeps access until period end
-  if (sub.cancel_at_period_end && sub.current_period_end) {
-    const accessUntil = new Date(sub.current_period_end * 1000).toISOString()
+  if (sub.cancel_at_period_end) {
+    // Fall back to now if Stripe omits current_period_end (shouldn't happen, but safe).
+    const accessUntil = sub.current_period_end
+      ? new Date(sub.current_period_end * 1000).toISOString()
+      : new Date().toISOString()
     await clerk.users.updateUserMetadata(clerkUserId, {
       publicMetadata:  { accessUntil },
       privateMetadata: { subscriptionStatus: sub.status as StripeSubStatus },
@@ -288,6 +291,7 @@ async function handlePatronPayment(
   event: Stripe.Event,
   clerkUserId: string,
   clerk: Awaited<ReturnType<typeof clerkClient>>,
+  publicMeta: UserPublicMetadata,
 ) {
   // One-time payment for Founding Patron tier.
   // checkout.session.completed fires first with session metadata.
@@ -296,8 +300,9 @@ async function handlePatronPayment(
   const isFounding = pi.metadata?.tier === "founding-patron"
   if (!isFounding) return
 
-  const user = await clerk.users.getUser(clerkUserId)
-  const current = (user.publicMetadata as UserPublicMetadata).tier
+  // Use publicMeta already loaded in the outer scope — avoid a second Clerk fetch
+  // that could race against the checkout.session.completed handler.
+  const current = publicMeta.tier
 
   // Only upgrade — never overwrite a founding-patron with this event
   if (current !== "founding-patron") {

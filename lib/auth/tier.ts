@@ -30,7 +30,7 @@ export function hasAccess(
 
   // If accessUntil is set and in the past, access has expired.
   if (accessUntil !== null && accessUntil !== undefined) {
-    if (new Date(accessUntil) < new Date()) return false
+    if (new Date(accessUntil) <= new Date()) return false
   }
 
   return TIER_RANK[userTier] >= TIER_RANK[required]

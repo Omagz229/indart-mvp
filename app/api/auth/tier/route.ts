@@ -24,7 +24,8 @@ export async function GET() {
       onboardingComplete: meta.onboardingComplete ?? false,
     })
   } catch {
-    // Clerk API unavailable — fall back to safe default
-    return NextResponse.json({ tier: "free", onboardingComplete: false })
+    // Clerk API unavailable — return 503 so clients fall back to JWT claims
+    // rather than silently treating all users as free during downtime.
+    return NextResponse.json({ error: "Clerk unavailable" }, { status: 503 })
   }
 }
