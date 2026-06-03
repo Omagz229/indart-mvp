@@ -45,7 +45,7 @@ export default function AccountPage() {
 
   const meta       = user.publicMetadata as { tier?: Tier }
   const tier: Tier = meta.tier ?? "free"
-  const unsafeMeta = user.unsafeMetadata as { interests?: string[]; traditions?: string[]; onboarded?: boolean }
+  const unsafeMeta = user.unsafeMetadata as { interests?: string[]; traditions?: string[] }
   const interests  = unsafeMeta.interests ?? []
   const traditions = unsafeMeta.traditions ?? []
 
