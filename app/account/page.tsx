@@ -43,10 +43,11 @@ export default function AccountPage() {
     return null
   }
 
-  const meta      = user.unsafeMetadata as { tier?: Tier; interests?: string[]; traditions?: string[]; onboarded?: boolean }
+  const meta       = user.publicMetadata as { tier?: Tier }
   const tier: Tier = meta.tier ?? "free"
-  const interests  = meta.interests ?? []
-  const traditions = meta.traditions ?? []
+  const unsafeMeta = user.unsafeMetadata as { interests?: string[]; traditions?: string[]; onboarded?: boolean }
+  const interests  = unsafeMeta.interests ?? []
+  const traditions = unsafeMeta.traditions ?? []
 
   const firstName = user.firstName ?? ""
   const lastName  = user.lastName  ?? ""
